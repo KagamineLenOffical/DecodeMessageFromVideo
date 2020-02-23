@@ -1,0 +1,6 @@
+/home/yuki/下载/CLion-2019.3.4/clion-2019.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" "/home/yuki/Code/Computer Network/DecodeMessageFromVideo"
+-- Found OpenCV: /usr/local (found version "4.2.0") 
+-- Configuring done
+WARNING: Target "DecodeMessageFromVideo" requests linking to directory "/usr/local/lib".  Targets may link only to libraries.  CMake is dropping the item.
+-- Generating done
+-- Build files have been written to: /home/yuki/Code/Computer Network/DecodeMessageFromVideo/cmake-build-debug
