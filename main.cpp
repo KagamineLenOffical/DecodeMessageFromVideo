@@ -5,9 +5,9 @@ using namespace std;
 using namespace cv;
 bool result[10000];
 int cnt=0;
-const int ROW=1500;
-const int COL=2400;
-const int LEN=100;
+const int ROW=1000;
+const int COL=1000;
+const int LEN=10;
 bool CheckForQRpos(Mat img){
 //    namedWindow("OriginalImage");
 //    imshow("OriginalImage",img);
@@ -15,9 +15,9 @@ bool CheckForQRpos(Mat img){
     cvtColor(img,gray_img,COLOR_BGR2GRAY);
     Mat threshold_img;
     threshold(gray_img,threshold_img,0,255,THRESH_BINARY|THRESH_OTSU);
-    namedWindow("ThresholdImage");
-    imshow("ThresholdImage",threshold_img);
-    waitKey(0);
+//    namedWindow("ThresholdImage");
+//    imshow("ThresholdImage",threshold_img);
+//    waitKey(0);
     vector<vector<Point>>contours;
     vector<Vec4i>hierarchy;
 
@@ -35,21 +35,21 @@ bool CheckForQRpos(Mat img){
                 QRPoint=i;
                 RotatedRect rect;
                 rect=minAreaRect(contours[i]);
-                if(rect.size.width>LEN*3||rect.size.height>LEN*3)continue;//判断是否为定位点（按大小）
+                if(rect.size.width>LEN*15||rect.size.height>LEN*15)continue;//判断是否为定位点（按大小）
                 QRPosPoint.push_back(contours[i]);
 
                 drawContours(dst,contours,i,Scalar(127,127,127));
-//                namedWindow("ThresholdImage");
-//                imshow("ThresholdImage",dst);
+                namedWindow("ThresholdImage");
+                imshow("ThresholdImage",dst);
 //                printf("%d\n",threshold_img.channels());
-//                waitKey(0);    //中间过程显示
+                waitKey(0);    //中间过程显示
             }
 
 
         }
     }
 
-    if(QRPosPoint.size()<3)return 0;
+    if(QRPosPoint.size()<4)return 0;
     vector<Point> res;
     for(int i=0;i<QRPosPoint.size();i++)
         for(int j=0;j<QRPosPoint[i].size();j++){
@@ -63,9 +63,10 @@ bool CheckForQRpos(Mat img){
         line(dst, v[i], v[i + 1], Scalar(127, 127, 127));
     }
     //接下来进行信息读取
-//    namedWindow("ThresholdImage");
-//    imshow("ThresholdImage",dst);
-//    waitKey(0);
+    namedWindow("ThresholdImage");
+    imshow("ThresholdImage",dst);
+    waitKey(0);
+    /*
     float minx=min(v[0].y,v[2].y),miny=min(v[0].x,v[2].x);
     float maxx=max(v[0].y,v[2].y),maxy=max(v[0].x,v[2].x);
 //    printf("x:%f %f y:%f %f\n",minx,maxx,miny,maxy);
@@ -84,9 +85,9 @@ bool CheckForQRpos(Mat img){
             else{
                 int tot=(int)px*(int)py;int avg_cnt=0;
 //                printf("%d %d\n",i,j);
-//                namedWindow("thresholdImg");
-//                imshow("thresholdImg",threshold_img);
-//                waitKey(0);
+                namedWindow("thresholdImg");
+                imshow("thresholdImg",threshold_img);
+                waitKey(0);
                 for(int k=0;k<(int)px;k++)
                     for(int l=0;l<(int)py;l++){
                         avg_cnt+=threshold_img.at<uchar>(x+k,y+l)>127?0:1;
@@ -97,12 +98,12 @@ bool CheckForQRpos(Mat img){
                 else result[cnt++]=0;
             }
         }
-
+    */
     return 1;
 }
 VideoCapture cap;
 int main() {
-    cap=VideoCapture("3.mp4");
+    cap=VideoCapture("4.mp4");
     int fps=30;
     Mat frame;
     while(1){
@@ -110,12 +111,12 @@ int main() {
         if(CheckForQRpos(frame))break;
     }
     memset(result,0,sizeof(result));
-    for(int i=0;i<2;i++)cap>>frame; //跳过前面不稳定的几帧
+    for(int i=0;i<7;i++)cap>>frame; //跳过前面不稳定的几帧
     cnt=0;
     while(1){
         if(frame.empty())break;
         if(!CheckForQRpos(frame))break;
-        for(int i=0;i<5;i++)cap>>frame;
+        for(int i=0;i<15;i++)cap>>frame;
     }
     for(int i=0;i<cnt;i++){
         printf("%d",result[i]);
