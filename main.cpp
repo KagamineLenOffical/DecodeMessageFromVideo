@@ -8,6 +8,38 @@ int cnt=0;
 const int ROW=1000;
 const int COL=1000;
 const int LEN=10;
+
+/*-----------------------------------------*/
+//变换
+
+Mat WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图像指针
+{
+    Mat DstMat;
+    Point2f SrcPoints[4];//变换来源的四点
+    
+    //从res中取出定位点到SrcPoints
+    for(int i=0;i<=NUMBER_OF_POS;i++)
+    {
+        SrcPoints[i]=res[i];
+    }
+    
+    
+    Point2f DstPoints[4];//变换目标的四点
+    
+    //初始化变换目标的四个点
+    DstPoints[0] = Point2f(0, 0);
+    DstPoints[1] = Point2f(0, SrcMat->rows);
+    DstPoints[2] = Point2f(SrcMat->cols, 0);
+    DstPoints[3] = Point2f(SrcMat->cols, SrcMat->rows);
+    
+    Mat TransBuffer = getPerspectiveTransform(DstPoints,DstPoints);  //TransBuffer存放变换矩阵
+    warpPerspective(*SrcMat, *SrcMat, TransBuffer, SrcMat->size());
+    return DstMat;
+    
+    
+}
+/*-----------------------------------------*/
+
 bool CheckForQRpos(Mat img){
 //    namedWindow("OriginalImage");
 //    imshow("OriginalImage",img);
