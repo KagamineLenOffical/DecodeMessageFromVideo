@@ -3,6 +3,7 @@
 #include <cstring>
 #define pow2(a) ((a)*(a))
 #define ll long long
+
 using namespace std;
 using namespace cv;
 bool result[800000];
@@ -11,6 +12,7 @@ int cnt=0;
 const int ROW=1000;
 const int COL=1000;
 const int LEN=10;
+
 const int NUMBER_OF_POS=4;
 /*int loc_point[9][9]={
         {1,1,1,1,1,1,1,0,0},
@@ -30,10 +32,11 @@ int dis(Point a,Point b){
     //printf("%d %d %d\n",a.x-b.x,a.y-b.y,pow2(a.x-b.x)+pow2(a.y-b.y));
     return pow2(a.x-b.x)+pow2(a.y-b.y);
 }
-Mat WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图像指针
+void WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图像指针
 {
     Mat DstMat;
     Point2f SrcPoints[4];//变换来源的四点
+
 
     //从res中取出定位点到SrcPoints
     for(int i=0;i<=NUMBER_OF_POS;i++)
@@ -50,9 +53,10 @@ Mat WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图
     DstPoints[2] = Point2f(COL-2*LEN, 0);
     DstPoints[3] = Point2f(COL-2*LEN, ROW-2*LEN);
 
+    //变换目标对应顺序：左上 左下 右上 右下
     Mat TransBuffer = getPerspectiveTransform(SrcPoints,DstPoints);  //TransBuffer存放变换矩阵
     warpPerspective(*SrcMat, *SrcMat, TransBuffer, SrcMat->size());
-    return DstMat;
+
 
 
 }
@@ -170,8 +174,7 @@ bool CheckForQRpos(Mat img){
     for(int i=0;i<3;i++) {
         line(dst, res[i], res[i + 1], Scalar(255, 255, 255));
     }
-    Mat fin;
-    fin=WarpImage(res,&img);
+    WarpImage(res,&img);
 //    namedWindow("ThresholdImage");
 //    imshow("ThresholdImage",img);
 //    waitKey(0);
