@@ -1,6 +1,8 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <cstring>
+#define OUTPUT_COL 3000
+#define NUMBER_OF_POS 3
 using namespace std;
 using namespace cv;
 bool result[10000];
@@ -11,10 +13,9 @@ const int LEN=10;
 
 /*-----------------------------------------*/
 //变换
-
-Mat WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图像指针
+void WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图像指针
 {
-    Mat DstMat;
+
     Point2f SrcPoints[4];//变换来源的四点
     
     //从res中取出定位点到SrcPoints
@@ -28,17 +29,20 @@ Mat WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和图
     
     //初始化变换目标的四个点
     DstPoints[0] = Point2f(0, 0);
-    DstPoints[1] = Point2f(0, SrcMat->rows);
-    DstPoints[2] = Point2f(SrcMat->cols, 0);
-    DstPoints[3] = Point2f(SrcMat->cols, SrcMat->rows);
+    DstPoints[1] = Point2f(0, OUTPUT_COL);
+    DstPoints[2] = Point2f(OUTPUT_COL, 0);
+    DstPoints[3] = Point2f(OUTPUT_COL, OUTPUT_COL);
     
-    Mat TransBuffer = getPerspectiveTransform(DstPoints,DstPoints);  //TransBuffer存放变换矩阵
+    //变换目标对应顺序：左上 左下 右上 右下
+    
+    Mat TransBuffer = getPerspectiveTransform(SrcPoints,DstPoints);  //TransBuffer存放变换矩阵
     warpPerspective(*SrcMat, *SrcMat, TransBuffer, SrcMat->size());
-    return DstMat;
+
     
     
 }
 /*-----------------------------------------*/
+
 
 bool CheckForQRpos(Mat img){
 //    namedWindow("OriginalImage");
