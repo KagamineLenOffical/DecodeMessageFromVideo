@@ -1,6 +1,10 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <cstring>
+extern "C"
+{
+    #include "zlib.h"
+}
 #define pow2(a) ((a)*(a))
 #define ll long long
 
@@ -27,6 +31,27 @@ const int NUMBER_OF_POS=4;
 };*/
 
 /*-----------------------------------------*/
+//压缩模块
+void zip(char *PreZipBits,unsigned char *ZippedBits)
+{
+    z_stream stream;
+    
+    
+    stream.next_in = (Bytef *)PreZipBits;
+    stream.avail_in = (uInt)strlen(PreZipBits);
+    
+    stream.next_out = (Bytef *)ZippedBits;
+    stream.avail_out = (uInt)1024;
+    
+    stream.zalloc = (alloc_func)0;
+    stream.zfree = (free_func)0;
+    stream.opaque = (voidpf)0;
+    
+    deflateInit(&stream, Z_DEFAULT_COMPRESSION);
+    deflate(&stream,Z_FINISH);
+    deflateEnd(&stream);     
+}
+
 //变换
 int dis(Point a,Point b){
     //printf("%d %d %d\n",a.x-b.x,a.y-b.y,pow2(a.x-b.x)+pow2(a.y-b.y));
