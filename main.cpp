@@ -6,11 +6,11 @@
 
 using namespace std;
 using namespace cv;
-bool result[800000];
-bool comp_src[800000];
+bool result[8000000];
+bool comp_src[8000000];
 int cnt=0;
 const int ROW=1000;
-const int COL=1000;
+const int COL=1800;
 const int LEN=10;
 
 const int NUMBER_OF_POS=4;
@@ -60,8 +60,8 @@ void WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和�
 
 
 }
-int r=ROW/LEN-2,c=ROW/LEN-2;
-int originpoint[ROW/LEN][COL/LEN];
+int r=ROW/LEN-2,c=COL/LEN-2;
+int originpoint[COL/LEN][ROW/LEN];
 /*-----------------------------------------*/
 void decode(Mat img){
     for(int i=0;i<c;i++)
@@ -76,6 +76,7 @@ void decode(Mat img){
             originpoint[i][r-j-1]=k;
             originpoint[c-i-1][r-j-1]=k;
         }
+    //rectangle(img,Point(0,0),Point(980,980),Scalar(0,0,0));
     for(int i=0;i<c;i++) {
         for (int j = 0; j < r; j++) {
             if (originpoint[i][j] == -1) {
@@ -90,16 +91,21 @@ void decode(Mat img){
 //                rectangle(img,Point(i*LEN,j*LEN),Point(i*LEN+LEN/2,j*LEN+LEN/2),Scalar(0,0,0));
 //                rectangle(img,Point(0,0),Point(80,80),color,FILLED);
                 result[cnt+2]=b<145;
+                //<145为1 >=145为0
                 result[cnt+1]=g<160;
                 result[cnt]=r<140;
-                if(result[cnt+2]!=comp_src[cnt+2]||result[cnt+1]!=comp_src[cnt+1]||
-                    result[cnt]!=comp_src[cnt]){
-                    rectangle(img,Point(i*LEN,j*LEN),Point(i*LEN+LEN,j*LEN+LEN),Scalar(0,0,0));
-                    rectangle(img,Point(0,0),Point(80,80),color,FILLED);
-                    printf("%d:%d %d %d\n",cnt,r,g,b);
-                    namedWindow("ThresholdImage");
-                    imshow("ThresholdImage",img);
-                    waitKey(0);
+                rectangle(img, Point(i * LEN, j * LEN), Point(i * LEN + LEN, j * LEN + LEN), Scalar(0, 0, 0),
+                          1);
+                if(result[cnt+1]^result[cnt]) {
+                    if (result[cnt + 2] != comp_src[cnt + 2] || result[cnt + 1] != comp_src[cnt + 1] ||
+                        result[cnt] != comp_src[cnt]) {
+
+                        rectangle(img, Point(0, 0), Point(80, 80), color, FILLED);
+                        printf("%d:%d %d %d\n", cnt, r, g, b);
+                        namedWindow("ThresholdImage");
+                        imshow("ThresholdImage", img);
+                        waitKey(0);
+                    }
                 }
 //                printf("%d %d %d",b,g,r);
 
@@ -174,6 +180,9 @@ bool CheckForQRpos(Mat img){
     for(int i=0;i<3;i++) {
         line(dst, res[i], res[i + 1], Scalar(255, 255, 255));
     }
+//    namedWindow("ThresholdImage");
+//    imshow("ThresholdImage",dst);
+//    waitKey(0);
     WarpImage(res,&img);
 //    namedWindow("ThresholdImage");
 //    imshow("ThresholdImage",img);
@@ -216,10 +225,14 @@ bool CheckForQRpos(Mat img){
 }
 VideoCapture cap;
 int main() {
-    cap=VideoCapture("7.mp4");
+    cap=VideoCapture("9.mp4");
     FILE *cmp_file=fopen("2.out","r");
     char ch;
     int _cnt=0;
+
+
+
+
     while((ch=fgetc(cmp_file))!=EOF){
         comp_src[_cnt++]=ch-'0';
     }
@@ -229,12 +242,44 @@ int main() {
         cap>>frame;
         if(CheckForQRpos(frame))break;
     }
+
+
+
+
+    Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
+    cameraMatrix.at<double>(0, 0) = 1802.4891034442435;
+    cameraMatrix.at<double>(0, 2) = 969.7033764824771;
+    cameraMatrix.at<double>(1, 1) = 1800.940836843952;
+    cameraMatrix.at<double>(1, 2) = 546.1764101253999;
+    cameraMatrix.at<double>(2, 2) = 1.0;
+
+    Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
+    distCoeffs.at<double>(0, 0) = 0.22082425770962424;
+    distCoeffs.at<double>(1, 0) = -0.998223161784493;
+    distCoeffs.at<double>(2, 0) = 4.7000979984294e-05;
+    distCoeffs.at<double>(3, 0) = 0.0007672376802051042;
+    distCoeffs.at<double>(4, 0) = 0.9611339808360126;
+
+    Mat view, rview, map1, map2;
+    Size imageSize;
+    imageSize = frame.size();
+    initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(),
+                            getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),
+                            imageSize, CV_16SC2, map1, map2);
+
+
+
+
+
     memset(result,0,sizeof(result));
     for(int i=0;i<2;i++)cap>>frame; //跳过前面不稳定的几帧
     cnt=0;
     while(1){
+
         if(frame.empty())break;
-        if(!CheckForQRpos(frame))break;
+        Mat frameCalibration;
+        remap(frame, frameCalibration, map1, map2, INTER_LINEAR);
+        if(!CheckForQRpos(frameCalibration))break;
         for(int i=0;i<5;i++)cap>>frame;
     }
     FILE *fout=fopen("1.out","w+");

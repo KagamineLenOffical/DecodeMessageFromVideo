@@ -11,8 +11,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="92b6efc1-081f-47c2-9a0d-a6dd3d472011" name="Default Changelist" comment="">
+    <list default="true" id="92b6efc1-081f-47c2-9a0d-a6dd3d472011" name="Default Changelist" comment="Merge branch 'master' of https://github.com/KagamineLenOffical/DecodeMessageFromVideo&#10;&#10;# Conflicts:&#10;#&#9;main.cpp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/1.out" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/1.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/2.out" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/2.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/7.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/7.mp4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/DecodeMessageFromVideo.dir/main.cpp.o" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/DecodeMessageFromVideo.dir/main.cpp.o" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmake-build-debug/DecodeMessageFromVideo" beforeDir="false" afterPath="$PROJECT_DIR$/cmake-build-debug/DecodeMessageFromVideo" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
@@ -83,63 +86,102 @@
       <workItem from="1583819864797" duration="340000" />
       <workItem from="1583820272130" duration="2374000" />
       <workItem from="1583829256685" duration="1769000" />
-      <workItem from="1583833878739" duration="542000" />
+      <workItem from="1583833878739" duration="2432000" />
+      <workItem from="1584424354058" duration="12000" />
+      <workItem from="1584599589373" duration="1859000" />
+      <workItem from="1584601609571" duration="2184000" />
+      <workItem from="1584604230583" duration="6000" />
+      <workItem from="1584606284267" duration="276000" />
+      <workItem from="1584606574930" duration="888000" />
+      <workItem from="1584607509770" duration="4104000" />
     </task>
+    <task id="LOCAL-00001" summary="Merge branch 'master' of https://github.com/KagamineLenOffical/DecodeMessageFromVideo&#10;&#10;# Conflicts:&#10;#&#9;main.cpp">
+      <created>1583836201023</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1583836201023</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merge branch 'master' of https://github.com/KagamineLenOffical/DecodeMessageFromVideo&#10;&#10;# Conflicts:&#10;#&#9;main.cpp" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'master' of https://github.com/KagamineLenOffical/DecodeMessageFromVideo&#10;&#10;# Conflicts:&#10;#&#9;main.cpp" />
+  </component>
   <component name="WindowStateProjectService">
+    <state x="3758" y="524" width="1992" height="1138" key="CommitChangelistDialog2" timestamp="1583836200842">
+      <screen x="1920" y="0" width="3840" height="2160" />
+    </state>
+    <state x="3758" y="524" width="1992" height="1138" key="CommitChangelistDialog2/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583836200842" />
+    <state x="3973" y="127" width="1677" height="1933" key="DiffContextDialog" timestamp="1583834962643">
+      <screen x="1920" y="0" width="3840" height="2160" />
+    </state>
+    <state x="3973" y="127" width="1677" height="1933" key="DiffContextDialog/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583834962643" />
     <state x="2713" y="851" width="424" height="483" key="FileChooserDialogImpl" timestamp="1583757335384">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
     <state x="2713" y="851" width="424" height="483" key="FileChooserDialogImpl/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583757335384" />
-    <state width="1823" height="771" key="GridCell.Tab.0.bottom" timestamp="1583831989482">
+    <state width="1858" height="580" key="GridCell.Tab.0.bottom" timestamp="1584615686387">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.0.bottom/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1858" height="580" key="GridCell.Tab.0.bottom/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615686387" />
     <state width="1799" height="254" key="GridCell.Tab.0.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1583243703162" />
-    <state width="1823" height="771" key="GridCell.Tab.0.center" timestamp="1583831989482">
+    <state width="1858" height="580" key="GridCell.Tab.0.center" timestamp="1584615686386">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.0.center/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1858" height="580" key="GridCell.Tab.0.center/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615686386" />
     <state width="1799" height="254" key="GridCell.Tab.0.center/67.27.1853.1053@67.27.1853.1053" timestamp="1583243703162" />
-    <state width="1823" height="771" key="GridCell.Tab.0.left" timestamp="1583831989481">
+    <state width="1858" height="580" key="GridCell.Tab.0.left" timestamp="1584615686386">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.0.left/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989481" />
+    <state width="1858" height="580" key="GridCell.Tab.0.left/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615686386" />
     <state width="1799" height="254" key="GridCell.Tab.0.left/67.27.1853.1053@67.27.1853.1053" timestamp="1583243703161" />
-    <state width="1823" height="771" key="GridCell.Tab.0.right" timestamp="1583831989482">
+    <state width="1858" height="580" key="GridCell.Tab.0.right" timestamp="1584615686386">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.0.right/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1858" height="580" key="GridCell.Tab.0.right/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615686386" />
     <state width="1799" height="254" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1583243703162" />
-    <state width="1823" height="771" key="GridCell.Tab.1.bottom" timestamp="1583831989482">
+    <state width="1859" height="771" key="GridCell.Tab.1.bottom" timestamp="1584615294311">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.1.bottom/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1859" height="771" key="GridCell.Tab.1.bottom/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615294311" />
     <state width="1346" height="318" key="GridCell.Tab.1.bottom/67.27.1853.1053@67.27.1853.1053" timestamp="1582289090017" />
-    <state width="1823" height="771" key="GridCell.Tab.1.center" timestamp="1583831989482">
+    <state width="1859" height="771" key="GridCell.Tab.1.center" timestamp="1584615294311">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.1.center/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1859" height="771" key="GridCell.Tab.1.center/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615294311" />
     <state width="1346" height="318" key="GridCell.Tab.1.center/67.27.1853.1053@67.27.1853.1053" timestamp="1582289090016" />
-    <state width="1823" height="771" key="GridCell.Tab.1.left" timestamp="1583831989482">
+    <state width="1859" height="771" key="GridCell.Tab.1.left" timestamp="1584615294311">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.1.left/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1859" height="771" key="GridCell.Tab.1.left/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615294311" />
     <state width="1346" height="318" key="GridCell.Tab.1.left/67.27.1853.1053@67.27.1853.1053" timestamp="1582289090015" />
-    <state width="1823" height="771" key="GridCell.Tab.1.right" timestamp="1583831989482">
+    <state width="1859" height="771" key="GridCell.Tab.1.right" timestamp="1584615294311">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state width="1823" height="771" key="GridCell.Tab.1.right/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583831989482" />
+    <state width="1859" height="771" key="GridCell.Tab.1.right/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584615294311" />
     <state width="1346" height="318" key="GridCell.Tab.1.right/67.27.1853.1053@67.27.1853.1053" timestamp="1582289090016" />
-    <state x="3124" y="681" key="com.intellij.ide.util.TipDialog" timestamp="1583812268770">
+    <state x="4406" y="828" width="800" height="530" key="Vcs.Push.Dialog.v2" timestamp="1583835823987">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
-    <state x="3124" y="681" key="com.intellij.ide.util.TipDialog/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583812268770" />
+    <state x="4406" y="828" width="800" height="530" key="Vcs.Push.Dialog.v2/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583835823987" />
+    <state x="3973" y="127" width="1677" height="1933" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1583835480762">
+      <screen x="1920" y="0" width="3840" height="2160" />
+    </state>
+    <state x="3973" y="127" width="1677" height="1933" key="com.intellij.history.integration.ui.views.FileHistoryDialog/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583835480762" />
+    <state x="3124" y="681" key="com.intellij.ide.util.TipDialog" timestamp="1584424357128">
+      <screen x="1920" y="0" width="3840" height="2160" />
+    </state>
+    <state x="3124" y="681" key="com.intellij.ide.util.TipDialog/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1584424357128" />
     <state x="648" y="359" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583648916407" />
+    <state x="4468" y="874" width="686" height="438" key="git4idea.merge.GitMergeDialog" timestamp="1583835937442">
+      <screen x="1920" y="0" width="3840" height="2160" />
+    </state>
+    <state x="4468" y="874" width="686" height="438" key="git4idea.merge.GitMergeDialog/1920.0.3840.2160/0.27.1920.1053@1920.0.3840.2160" timestamp="1583835937442" />
     <state x="2931" y="539" width="1393" height="1391" key="search.everywhere.popup" timestamp="1583756611390">
       <screen x="1920" y="0" width="3840" height="2160" />
     </state>
