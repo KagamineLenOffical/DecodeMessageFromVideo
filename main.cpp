@@ -1,19 +1,35 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <cstring>
+#include <bitset>
 #define pow2(a) ((a)*(a))
 #define ll long long
+#define Data_Block_Size_By_Bit 256      //改变这个可以调节数据块大小。具体多大最合适和错误率挂钩，我没算。暂时不要改动，否则会出错。
+#define Buffer_Size_By_Byte 1024*1024*100
+#define Buffer_Size_By_Bit 1024*1024*50*8
 
 using namespace std;
 using namespace cv;
-bool result[8000000];
-bool comp_src[8000000];
-int cnt=0;
+
+bool Raw_Data_Read_Buffer[Buffer_Size_By_Bit];
+bool Processed_Data_Buffer[Buffer_Size_By_Bit];
+bool Original_Raw_Data_Buffer[Buffer_Size_By_Bit];
+
+
+
+
+int Total_Bits_Read=0;
+int After_Process_Bits = 0;
 const int ROW=1000;
 const int COL=1800;
 const int LEN=10;
 
+char Input_Video_Path_Buffer[200];
+char Output_Result_Path_Buffer[200];
+char Output_Error_Tracker_Path_Buffer[200];
+
 const int NUMBER_OF_POS=4;
+
 /*int loc_point[9][9]={
         {1,1,1,1,1,1,1,0,0},
         {1,0,0,0,0,0,1,0,0},
@@ -26,7 +42,7 @@ const int NUMBER_OF_POS=4;
         {0,0,0,0,0,0,0,0,0}
 };*/
 
-/*-----------------------------------------*/
+/*------------------预处理出错找这里----------------------*/
 //变换
 int dis(Point a,Point b){
     //printf("%d %d %d\n",a.x-b.x,a.y-b.y,pow2(a.x-b.x)+pow2(a.y-b.y));
@@ -60,75 +76,152 @@ void WarpImage(vector<Point> res,Mat *SrcMat)    //输入定位点的vector和�
 
 
 }
-int r=ROW/LEN-2,c=COL/LEN-2;
+int Rows_Of_Block=ROW/LEN-2;
+int Columns_Of_Block=COL/LEN-2;
 int originpoint[COL/LEN][ROW/LEN];
-/*-----------------------------------------*/
-void decode(Mat img){
-    for(int i=0;i<c;i++)
-        for(int j=0;j<r;j++){
+/*-----------------------------------------------------*/
+
+
+
+
+/*------------------检错码出错找这里----------------------*/
+void Take_Out_Parity_Bits_And_Create_Error_Checking_Binary(bool *Pre_Processed_Data,bool *After_Processed_Data)  //奇校验
+{
+    int Marker_Pre_Processed = 0;
+    int Marker_After_Processed = 0;
+    int Parity_Number_Tracker = 0;
+    int Parity_Current_Parity_Tracker = 0;
+    FILE *fout = fopen(Output_Error_Tracker_Path_Buffer,"w+");
+    int Block_Size_With_Parity_Bit = Data_Block_Size_By_Bit + 1 ;
+    After_Process_Bits = Total_Bits_Read;
+
+
+
+    while(Marker_Pre_Processed <= Total_Bits_Read)
+    {
+        After_Processed_Data[Marker_After_Processed] = Pre_Processed_Data[Marker_Pre_Processed];
+        if(Pre_Processed_Data[Marker_Pre_Processed] == 1)
+        {
+            Parity_Current_Parity_Tracker ++;
+        }
+        Marker_Pre_Processed ++;
+
+        Marker_After_Processed ++;
+
+        Parity_Number_Tracker ++;
+        if(Parity_Number_Tracker == Block_Size_With_Parity_Bit )
+        {
+            Marker_After_Processed--;//把刚才读到After数组里的校验位退回去。
+            After_Process_Bits--;
+            if(Parity_Current_Parity_Tracker % 2 == 1) //余1，就是奇数嘛，就是代表没错
+            {
+                //写32个字节
+                for(int i = 0 ; i < (Data_Block_Size_By_Bit/8) ; i++)
+                {
+                    fputc(255,fout);   //255 = 11111111
+                }
+
+            }
+            else //错了就写一堆0
+            {
+                for(int i = 0 ; i < (Data_Block_Size_By_Bit/8) ; i++)
+                {
+                    fputc(0,fout);   //0 = 00000000
+                }
+            }
+            Parity_Current_Parity_Tracker = 0;
+            Parity_Number_Tracker = 0;
+
+        }
+
+    }
+
+    for(int i = 0 ; i < 32 ; i++)  //最后再多写32字节。
+    {
+        fputc(255,fout);   //255 = 11111111
+    }
+
+
+}
+/*-----------------------------------------------------*/
+
+
+
+
+
+
+void decode(Mat img)
+{
+    for(int i=0;i<Columns_Of_Block;i++)
+        for(int j=0;j<Rows_Of_Block;j++)
+        {
             originpoint[i][j]=-1;
         }
     for(int i=0;i<9;i++)
-        for(int j=0;j<9;j++){
+        for(int j=0;j<9;j++)
+        {
             int k=1;
             originpoint[i][j]=k;
-            originpoint[c-i-1][j]=k;
-            originpoint[i][r-j-1]=k;
-            originpoint[c-i-1][r-j-1]=k;
+            originpoint[Columns_Of_Block-i-1][j]=k;
+            originpoint[i][Rows_Of_Block-j-1]=k;
+            originpoint[Columns_Of_Block-i-1][Rows_Of_Block-j-1]=k;
         }
-    //rectangle(img,Point(0,0),Point(980,980),Scalar(0,0,0));
-    for(int i=0;i<c;i++) {
-        for (int j = 0; j < r; j++) {
-            if (originpoint[i][j] == -1) {
+
+
+
+    for(int i=0;i<Columns_Of_Block;i++)
+    {
+        for (int j = 0; j < Rows_Of_Block; j++)
+        {
+            if (originpoint[i][j] == -1)
+            {
 
                 int x=i*LEN+LEN/2,y = j * LEN + LEN/2;
 
-//                rectangle(img,Point(i*LEN,j*LEN),Point(i*LEN+10,j*LEN+10),Scalar(0,0,0));
                 int b=img.at<Vec3b>(Point(x,y))[0];
                 int g=img.at<Vec3b>(Point(x,y))[1];
                 int r=img.at<Vec3b>(Point(x,y))[2];
                 Scalar color(b,g,r);
-//                rectangle(img,Point(i*LEN,j*LEN),Point(i*LEN+LEN/2,j*LEN+LEN/2),Scalar(0,0,0));
-//                rectangle(img,Point(0,0),Point(80,80),color,FILLED);
-                result[cnt+2]=b<145;
+
+                Raw_Data_Read_Buffer[Total_Bits_Read+2]=b<145;
                 //<145为1 >=145为0
-                result[cnt+1]=g<160;
-                result[cnt]=r<140;
-                rectangle(img, Point(i * LEN, j * LEN), Point(i * LEN + LEN, j * LEN + LEN), Scalar(0, 0, 0),
-                          1);
-                if(result[cnt+1]^result[cnt]) {
-                    if (result[cnt + 2] != comp_src[cnt + 2] || result[cnt + 1] != comp_src[cnt + 1] ||
-                        result[cnt] != comp_src[cnt]) {
+                Raw_Data_Read_Buffer[Total_Bits_Read+1]=g<160;
+                Raw_Data_Read_Buffer[Total_Bits_Read]=r<140;
+                rectangle(img, Point(i * LEN, j * LEN), Point(i * LEN + LEN, j * LEN + LEN), Scalar(0, 0, 0),1);
+
+
+
+                /*这里是显示错误的程序*/
+                if(Raw_Data_Read_Buffer[Total_Bits_Read+1]^Raw_Data_Read_Buffer[Total_Bits_Read])
+                {
+                    if (Raw_Data_Read_Buffer[Total_Bits_Read + 2] != Original_Raw_Data_Buffer[Total_Bits_Read + 2] || Raw_Data_Read_Buffer[Total_Bits_Read + 1] != Original_Raw_Data_Buffer[Total_Bits_Read + 1] ||
+                        Raw_Data_Read_Buffer[Total_Bits_Read] != Original_Raw_Data_Buffer[Total_Bits_Read])
+                    {
 
                         rectangle(img, Point(0, 0), Point(80, 80), color, FILLED);
-                        printf("%d:%d %d %d\n", cnt, r, g, b);
-                        namedWindow("ThresholdImage");
-                        imshow("ThresholdImage", img);
-                        waitKey(0);
+                        printf("%d:%d %d %d\n", Total_Bits_Read, r, g, b);
+//                        namedWindow("ThresholdImage");
+//                        imshow("ThresholdImage", img);
+//                        waitKey(0);
                     }
                 }
-//                printf("%d %d %d",b,g,r);
 
-                cnt+=3;
+                Total_Bits_Read+=3;
             }
 
         }
     }
-//    namedWindow("ThresholdImage");
-//    imshow("ThresholdImage",img);
-//    waitKey(0);
+
 }
-bool CheckForQRpos(Mat img){
-//    namedWindow("OriginalImage");
-//    imshow("OriginalImage",img);
-//    waitKey(0);
+
+
+bool CheckForQRpos(Mat img)
+{
+
     Mat gray_img;
     cvtColor(img,gray_img,COLOR_BGR2GRAY);
     Mat threshold_img;
     threshold(gray_img,threshold_img,0,255,THRESH_BINARY|THRESH_OTSU);
-//    namedWindow("ThresholdImage");
-//    imshow("ThresholdImage",threshold_img);
-//    waitKey(0);
     vector<vector<Point>>contours;
     vector<Vec4i>hierarchy;
 
@@ -141,22 +234,15 @@ bool CheckForQRpos(Mat img){
     for(int i=0;i<contours.size();i++){
         if(hierarchy[i][2]!=-1){  //有子轮廓
             son=hierarchy[i][2];
-            if(hierarchy[son][2]!=-1){
-//                printf("%d\n",hierarchy[son][3]);
+            if(hierarchy[son][2]!=-1)
+            {
+
                 QRPoint=i;
                 RotatedRect rect;
                 rect=minAreaRect(contours[i]);
                 if(rect.size.width>LEN*15||rect.size.height>LEN*15)continue;//判断是否为定位点（按大小）
                 QRPosPoint.push_back(contours[i]);
-
-//                drawContours(dst,contours,i,Scalar(127,127,127));
-//                namedWindow("ThresholdImage");
-//                imshow("ThresholdImage",dst);
-//                printf("%d\n",threshold_img.channels());
-//                waitKey(0);    //中间过程显示
             }
-
-
         }
     }
 
@@ -169,7 +255,6 @@ bool CheckForQRpos(Mat img){
     for(int i=0;i<QRPosPoint.size();i++)
         for(int j=0;j<QRPosPoint[i].size();j++){
             Point t=QRPosPoint[i][j];
-            // printf("%d %d\n",t.x,t.y);
             for(int k=0;k<4;k++){
                 if(dis(t,tmp[k])<d[k]){
                     d[k]=dis(t,tmp[k]);
@@ -180,76 +265,60 @@ bool CheckForQRpos(Mat img){
     for(int i=0;i<3;i++) {
         line(dst, res[i], res[i + 1], Scalar(255, 255, 255));
     }
-//    namedWindow("ThresholdImage");
-//    imshow("ThresholdImage",dst);
-//    waitKey(0);
+
     WarpImage(res,&img);
-//    namedWindow("ThresholdImage");
-//    imshow("ThresholdImage",img);
-//    waitKey(0);
+
     //接下来进行信息读取
     decode(img);
-    /*
-    float minx=min(v[0].y,v[2].y),miny=min(v[0].x,v[2].x);
-    float maxx=max(v[0].y,v[2].y),maxy=max(v[0].x,v[2].x);
-//    printf("x:%f %f y:%f %f\n",minx,maxx,miny,maxy);
-    float px=(maxx-minx)/(ROW/LEN),py=(maxy-miny)/(COL/LEN);
-//    printf("px %f py %f\n",px,py);
-    for (int i = 0; i < COL / LEN; i++)
-        for (int j = 0; j < ROW / LEN; j++) {
-            int x = int(minx+px*j), y = int(miny+py*i);
-            if ((i == 0 && j == 0) || (i == COL / LEN - 1 && j == 0) || (i == 0 && j == ROW / LEN - 1)) {
-                continue;
-            }
-            else if ((i == 0 && (j == 1 || j == ROW / LEN - 2)) ||
-                       (i == 1 && (j == 0 || j == 1 || j == ROW / LEN - 2 || j == ROW / LEN - 1)) ||
-                       (i == COL / LEN - 2 && (j == 0 || j == 1)) || (i == COL / LEN - 1 && j == 1)) { continue; }
-            else{
-                int tot=(int)px*(int)py;int avg_cnt=0;
-//                printf("%d %d\n",i,j);
-                namedWindow("thresholdImg");
-                imshow("thresholdImg",threshold_img);
-                waitKey(0);
-                for(int k=0;k<(int)px;k++)
-                    for(int l=0;l<(int)py;l++){
-                        avg_cnt+=threshold_img.at<uchar>(x+k,y+l)>127?0:1;
-                        threshold_img.at<uchar>(x+k,y+l)=0;
-                    }
-                float avg=(float)avg_cnt/tot;
-                if(avg>0.5)result[cnt++]=1;
-                else result[cnt++]=0;
-            }
-        }
-    */
+
     return 1;
 }
+
+
 VideoCapture cap;
-int main() {
-    cap=VideoCapture("9.mp4");
-    FILE *cmp_file=fopen("2.out","r");
+
+int main(int argc,char *argv[])
+{
+    strcpy(Input_Video_Path_Buffer,argv[1]);
+    strcpy(Output_Result_Path_Buffer,argv[2]);
+    strcpy(Output_Error_Tracker_Path_Buffer,argv[3]);
+
+
+    cap=VideoCapture(Input_Video_Path_Buffer);
+
+    FILE *cmp_file=fopen("Processed.out","r");  //改成对比Processed.out了。因为图片对比
     char ch;
     int _cnt=0;
 
-
-
-
-    while((ch=fgetc(cmp_file))!=EOF){
-        comp_src[_cnt++]=ch-'0';
+    while((ch=fgetc(cmp_file))!=EOF)
+    {
+        Original_Raw_Data_Buffer[_cnt++]=ch-'0';
     }
-    int fps=30;
+
     Mat frame;
     while(1){
         cap>>frame;
         if(CheckForQRpos(frame))break;
     }
 
-
-
+//    Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
+//    cameraMatrix.at<double>(0, 0) = 1802.4891034442435;
+//    cameraMatrix.at<double>(0, 2) = 969.7033764824771;
+//    cameraMatrix.at<double>(1, 1) = 1800.940836843952;
+//    cameraMatrix.at<double>(1, 2) = 546.1764101253999;
+//    cameraMatrix.at<double>(2, 2) = 1.0;
+//
+//    Mat distCoeffs = Mat::zeros(5, 1, CV_64F);
+//    distCoeffs.at<double>(0, 0) = 0.22082425770962424;
+//    distCoeffs.at<double>(1, 0) = -0.998223161784493;
+//    distCoeffs.at<double>(2, 0) = 4.7000979984294e-05;
+//    distCoeffs.at<double>(3, 0) = 0.0007672376802051042;
+//    distCoeffs.at<double>(4, 0) = 0.9611339808360126;
 
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
-    cameraMatrix.at<double>(0, 0) = 1802.4891034442435;
-    cameraMatrix.at<double>(0, 2) = 969.7033764824771;
-    cameraMatrix.at<double>(1, 1) = 1800.940836843952;
+    cameraMatrix.at<double>(0, 0) = 6000.4891034442435;
+    cameraMatrix.at<double>(0, 2) = 1200.7033764824771;
+    cameraMatrix.at<double>(1, 1) = 6000.940836843952;
     cameraMatrix.at<double>(1, 2) = 546.1764101253999;
     cameraMatrix.at<double>(2, 2) = 1.0;
 
@@ -260,46 +329,107 @@ int main() {
     distCoeffs.at<double>(3, 0) = 0.0007672376802051042;
     distCoeffs.at<double>(4, 0) = 0.9611339808360126;
 
+
     Mat view, rview, map1, map2;
     Size imageSize;
     imageSize = frame.size();
     initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(),
-                            getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),
-                            imageSize, CV_16SC2, map1, map2);
+                            getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),imageSize, CV_16SC2, map1, map2);
 
 
 
 
 
-    memset(result,0,sizeof(result));
+    memset(Raw_Data_Read_Buffer,0,sizeof(Raw_Data_Read_Buffer));
     for(int i=0;i<2;i++)cap>>frame; //跳过前面不稳定的几帧
-    cnt=0;
-    while(1){
+    Total_Bits_Read=0;
 
+    while(1)
+    {
         if(frame.empty())break;
         Mat frameCalibration;
         remap(frame, frameCalibration, map1, map2, INTER_LINEAR);
         if(!CheckForQRpos(frameCalibration))break;
         for(int i=0;i<5;i++)cap>>frame;
     }
-    FILE *fout=fopen("1.out","w+");
 
-    for(int i=0;i<cnt;i++){
-        fprintf(fout,"%d",result[i]);
+
+
+
+
+
+    FILE *fout=fopen("Processed_Read.out","w+");
+
+
+    for(int i = 0 ;i < Total_Bits_Read ; i++)
+    {
+        fprintf(fout,"%d",Raw_Data_Read_Buffer[i]);
     }
+
     fclose(fout);
-    printf("\ntot bit:%d",cnt);
-    cout<<endl;
-    char s[100000];
-    int now=0;
-    memset(s,0,sizeof(s));
-    while(1){
-        for(int i=now*8+7;i>=now*8;i--)s[now]=(s[now]<<1)|result[i];
-        if(s[now]==0)break;
-        now++;
+
+
+    Take_Out_Parity_Bits_And_Create_Error_Checking_Binary(Raw_Data_Read_Buffer, Processed_Data_Buffer);
+
+    fout = fopen(Output_Result_Path_Buffer,"wb+");
+
+    int j = 1;
+    unsigned char CharStorege = 0;
+    for(int i = 0 ; i < After_Process_Bits ; i++)
+    {
+        if(Processed_Data_Buffer[i])
+        {
+            switch(j)
+            {
+                case 1:
+                    CharStorege += 1;
+                    break;
+                case 2:
+                    CharStorege += 2;
+                    break;
+                case 3:
+                    CharStorege += 4;
+                    break;
+                case 4:
+                    CharStorege += 8;
+                    break;
+                case 5:
+                    CharStorege += 16;
+                    break;
+                case 6:
+                    CharStorege += 32;
+                    break;
+                case 7:
+                    CharStorege += 64;
+                    break;
+                case 8:
+                    CharStorege += 128;
+                    break;
+
+
+            }
+        }
+        if( j == 8 )
+        {
+            j = 0;
+            fputc(CharStorege,fout);
+            CharStorege = 0;
+        }
+
+        j++;
     }
-    printf("%s",s);
-    waitKey(0);
+
+    fclose(fout);
+
+
+
+
+
+
+
+    printf("\ntot bit:%d",Total_Bits_Read);
+    cout<<endl;
+
     return 0;
 
 }
