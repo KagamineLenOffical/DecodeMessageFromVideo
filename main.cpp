@@ -8,6 +8,7 @@
 #define Buffer_Size_By_Byte 1024*1024*100
 #define Buffer_Size_By_Bit 1024*1024*50*8
 
+
 using namespace std;
 using namespace cv;
 
@@ -101,6 +102,7 @@ void Take_Out_Parity_Bits_And_Create_Error_Checking_Binary(bool *Pre_Processed_D
     {
         After_Processed_Data[Marker_After_Processed] = Pre_Processed_Data[Marker_Pre_Processed];
         if(Pre_Processed_Data[Marker_Pre_Processed] == 1)
+
         {
             Parity_Current_Parity_Tracker ++;
         }
@@ -140,8 +142,6 @@ void Take_Out_Parity_Bits_And_Create_Error_Checking_Binary(bool *Pre_Processed_D
     {
         fputc(255,fout);   //255 = 11111111
     }
-
-
 }
 /*-----------------------------------------------------*/
 
@@ -166,9 +166,6 @@ void decode(Mat img)
             originpoint[i][Rows_Of_Block-j-1]=k;
             originpoint[Columns_Of_Block-i-1][Rows_Of_Block-j-1]=k;
         }
-
-
-
     for(int i=0;i<Columns_Of_Block;i++)
     {
         for (int j = 0; j < Rows_Of_Block; j++)
@@ -189,8 +186,6 @@ void decode(Mat img)
                 Raw_Data_Read_Buffer[Total_Bits_Read]=r<140;
                 rectangle(img, Point(i * LEN, j * LEN), Point(i * LEN + LEN, j * LEN + LEN), Scalar(0, 0, 0),1);
 
-
-
                 /*这里是显示错误的程序*/
                 if(Raw_Data_Read_Buffer[Total_Bits_Read+1]^Raw_Data_Read_Buffer[Total_Bits_Read])
                 {
@@ -200,9 +195,6 @@ void decode(Mat img)
 
                         rectangle(img, Point(0, 0), Point(80, 80), color, FILLED);
                         printf("%d:%d %d %d\n", Total_Bits_Read, r, g, b);
-//                        namedWindow("ThresholdImage");
-//                        imshow("ThresholdImage", img);
-//                        waitKey(0);
                     }
                 }
 
@@ -314,7 +306,6 @@ int main(int argc,char *argv[])
 //    distCoeffs.at<double>(2, 0) = 4.7000979984294e-05;
 //    distCoeffs.at<double>(3, 0) = 0.0007672376802051042;
 //    distCoeffs.at<double>(4, 0) = 0.9611339808360126;
-
     Mat cameraMatrix = Mat::eye(3, 3, CV_64F);
     cameraMatrix.at<double>(0, 0) = 6000.4891034442435;
     cameraMatrix.at<double>(0, 2) = 1200.7033764824771;
@@ -334,7 +325,7 @@ int main(int argc,char *argv[])
     Size imageSize;
     imageSize = frame.size();
     initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(),
-                            getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),imageSize, CV_16SC2, map1, map2);
+    getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0),imageSize, CV_16SC2, map1, map2);
 
 
 
@@ -343,7 +334,6 @@ int main(int argc,char *argv[])
     memset(Raw_Data_Read_Buffer,0,sizeof(Raw_Data_Read_Buffer));
     for(int i=0;i<2;i++)cap>>frame; //跳过前面不稳定的几帧
     Total_Bits_Read=0;
-
     while(1)
     {
         if(frame.empty())break;
@@ -431,5 +421,6 @@ int main(int argc,char *argv[])
     cout<<endl;
 
     return 0;
+
 
 }
